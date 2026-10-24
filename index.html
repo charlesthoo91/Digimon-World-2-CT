@@ -156,7 +156,7 @@ const tcls=t=>(TYPES.find(x=>x[0]===t)||[0,''])[1];
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 function match(d){
   const q=state.q.trim().toLowerCase();
-  if(q && !(d.n.includes(q)||d.en.toLowerCase().includes(q)))return false;
+  if(q && (state.exact?d.n.toLowerCase()!==q:!(d.n.toLowerCase().includes(q)||d.en.toLowerCase().includes(q))))return false;
   if(state.stage.size&&!state.stage.has(d.s))return false;
   if(state.type.size&&!state.type.has(d.t))return false;
   if(state.fam.size&&!state.fam.has(d.f))return false;
@@ -196,8 +196,8 @@ function render(){
 }
 function setTab(t){state.tab=t;$("#tab-dna").setAttribute("aria-selected",t==="dna");const dn=t==="dna";$("#dna").hidden=!dn;$("#list").hidden=dn;["#q","#f-stage","#f-type","#f-fam"].forEach(s=>{const e=$(s);e.hidden=dn});$("#only-rec").parentElement.hidden=dn;$("#tab-mon").setAttribute("aria-selected",t==="mon");$("#tab-hall").setAttribute("aria-selected",t==="hall");if(dn)return;$('#tab-mon').setAttribute('aria-selected',t==='mon');$('#tab-hall').setAttribute('aria-selected',t==='hall');if(t==='hall'){state.rec=true;$('#only-rec').setAttribute('aria-pressed','true')}render()}
 $('#tab-mon').onclick=()=>setTab('mon');$('#tab-dna').onclick=()=>setTab('dna');$('#tab-hall').onclick=()=>setTab('hall');
-$('#q').oninput=e=>{state.q=e.target.value;render()};
-$('#list').addEventListener('click',e=>{const b=e.target.closest('.evl');if(!b)return;const q=$('#q');q.value=b.dataset.n;state.q=b.dataset.n;render();window.scrollTo({top:0,behavior:'smooth'})});
+$('#q').oninput=e=>{state.q=e.target.value;state.exact=false;render()};
+$('#list').addEventListener('click',e=>{const b=e.target.closest('.evl');if(!b)return;const q=$('#q');q.value=b.dataset.n;state.q=b.dataset.n;state.exact=true;['stage','type','fam'].forEach(k=>state[k].clear());state.rec=false;state.hall='';$('#hall-sel').value='';document.querySelectorAll('#f-stage .chip,#f-type .chip,#f-fam .chip,#only-rec').forEach(c=>c.setAttribute('aria-pressed','false'));render();window.scrollTo({top:0,behavior:'smooth'})});
 $('#only-rec').onclick=e=>{state.rec=!state.rec;e.target.setAttribute('aria-pressed',state.rec);render()};
 $('#sort').onchange=e=>{state.sort=e.target.value;render()};
 $('#hall-sel').onchange=e=>{state.hall=e.target.value;render()};
