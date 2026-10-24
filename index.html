@@ -63,6 +63,7 @@ main .wrap{padding-block:16px 40px;display:grid;gap:10px}
 .e-水{color:var(--e-water)}.e-火{color:var(--e-fire)}.e-自然{color:var(--e-nature)}.e-機械{color:var(--e-machine)}.e-暗{color:var(--e-dark)}
 .locs{display:flex;flex-wrap:wrap;gap:6px}
 .evo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}
+.reset{flex:none}
 .evnote{grid-column:1/-1;margin:0;font-size:13px;color:var(--muted)}
 .evh{font-weight:700;color:var(--muted,#888);margin-right:2px}
 .evl{font:inherit;font-size:13px;background:transparent;border:1px solid var(--line);border-radius:999px;padding:2px 9px;cursor:pointer;color:inherit}
@@ -119,6 +120,7 @@ main .wrap{padding-block:16px 40px;display:grid;gap:10px}
       <button class="tab" role="tab" id="tab-dna" aria-selected="false">DNA合體</button>
     </div>
     <input type="search" id="q" placeholder="搜尋名稱（中文或英文）" aria-label="搜尋">
+    <button class="chip reset" id="reset" title="清除目前頁面的搜尋與篩選">重置</button>
   </div>
   <div class="row" id="f-stage"><span class="lbl">世代</span></div>
   <div class="row" id="f-type"><span class="lbl">種族</span></div>
@@ -197,6 +199,7 @@ function render(){
 function setTab(t){state.tab=t;$("#tab-dna").setAttribute("aria-selected",t==="dna");const dn=t==="dna";$("#dna").hidden=!dn;$("#list").hidden=dn;["#q","#f-stage","#f-type","#f-fam"].forEach(s=>{const e=$(s);e.hidden=dn});$("#only-rec").parentElement.hidden=dn;$("#tab-mon").setAttribute("aria-selected",t==="mon");$("#tab-hall").setAttribute("aria-selected",t==="hall");if(dn)return;$('#tab-mon').setAttribute('aria-selected',t==='mon');$('#tab-hall').setAttribute('aria-selected',t==='hall');if(t==='hall'){state.rec=true;$('#only-rec').setAttribute('aria-pressed','true')}render()}
 $('#tab-mon').onclick=()=>setTab('mon');$('#tab-dna').onclick=()=>setTab('dna');$('#tab-hall').onclick=()=>setTab('hall');
 $('#q').oninput=e=>{state.q=e.target.value;state.exact=false;render()};
+$('#reset').onclick=()=>{if(state.tab==='dna'){window.dnaReset&&window.dnaReset();return}state.q='';state.exact=false;$('#q').value='';['stage','type','fam'].forEach(k=>state[k].clear());document.querySelectorAll('#f-stage .chip,#f-type .chip,#f-fam .chip').forEach(x=>x.setAttribute('aria-pressed','false'));state.rec=state.tab==='hall';$('#only-rec').setAttribute('aria-pressed',state.rec);state.sort='id';$('#sort').value='id';state.hall='';$('#hall-sel').value='';render();window.scrollTo({top:0,behavior:'smooth'})};
 $('#list').addEventListener('click',e=>{const b=e.target.closest('.evl');if(!b)return;const q=$('#q');q.value=b.dataset.n;state.q=b.dataset.n;state.exact=true;['stage','type','fam'].forEach(k=>state[k].clear());state.rec=false;state.hall='';$('#hall-sel').value='';document.querySelectorAll('#f-stage .chip,#f-type .chip,#f-fam .chip,#only-rec').forEach(c=>c.setAttribute('aria-pressed','false'));render();window.scrollTo({top:0,behavior:'smooth'})});
 $('#only-rec').onclick=e=>{state.rec=!state.rec;e.target.setAttribute('aria-pressed',state.rec);render()};
 $('#sort').onchange=e=>{state.sort=e.target.value;render()};
@@ -246,6 +249,7 @@ function calc(){
   grid();
 }
 $('#pa').oninput=calc;$('#pb').oninput=calc;
+window.dnaReset=()=>{$('#pa').value='';$('#pb').value='';gs='成熟期';gb='數據';hl=null;calc()};
 grid();
 })();
 </script>
